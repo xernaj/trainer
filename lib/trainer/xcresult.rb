@@ -389,6 +389,24 @@ module Trainer
         super
       end
 
+      def failure_stacktrace
+        new_stacktrace = ""
+        if self.document_location_in_creating_workspace
+          file_path = self.document_location_in_creating_workspace.url.gsub("file://", "")
+          new_stacktrace = "#{file_path}"
+          uri = URI.parse(self.document_location_in_creating_workspace.url)
+          last_path = uri.path.split('/').last
+          puts "path: #{uri.path}"
+          puts "last_path: #{last_path}"
+          puts "fragment: #{uri.fragment}"
+          puts "line num: #{uri.fragment[/StartingLineNumber=(.*)/, 1]}"
+          line_num = uri.fragment[/StartingLineNumber=(.*)/, 1]
+
+          new_stacktrace = "#{last_path}:#{line_num}"
+        end
+        return new_stacktrace
+      end
+
       def failure_message
         new_message = self.message
         if self.document_location_in_creating_workspace

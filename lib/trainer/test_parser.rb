@@ -203,7 +203,8 @@ module Trainer
               line_number: 0,
               message: "",
               performance_failure: {},
-              failure_message: failure.failure_message
+              failure_message: failure.failure_message,
+              failure_stacktrace: failure.failure_stacktrace
             }]
           end
 
@@ -253,7 +254,8 @@ module Trainer
                   line_number: current_failure['LineNumber'],
                   message: current_failure['Message'],
                   performance_failure: current_failure['PerformanceFailure'],
-                  failure_message: "#{current_failure['Message']} (#{current_failure['FileName']}:#{current_failure['LineNumber']})"
+                  failure_message: "#{current_failure['Message']} (#{current_failure['FileName']}:#{current_failure['LineNumber']})",
+                  failure_stacktrace: "#{current_failure['FileName']}:#{current_failure['LineNumber']}"
                 }
               end
             end
