@@ -396,13 +396,16 @@ module Trainer
           new_stacktrace = "#{file_path}"
           uri = URI.parse(self.document_location_in_creating_workspace.url)
           last_path = uri.path.split('/').last
+          test_path = uri.path[/#{self.producing_target}.*/] # eg. AppUITest/Test.swift
+          puts "producingTarget: #{self.producing_target}"
+          puts "test_path: #{test_path}"
           puts "path: #{uri.path}"
           puts "last_path: #{last_path}"
           puts "fragment: #{uri.fragment}"
           puts "line num: #{uri.fragment[/StartingLineNumber=(.*)/, 1]}"
           line_num = uri.fragment[/StartingLineNumber=(.*)/, 1]
 
-          new_stacktrace = "#{last_path}:#{line_num}"
+          new_stacktrace = "#{test_path}:#{line_num}"
         end
         return new_stacktrace
       end
