@@ -392,17 +392,10 @@ module Trainer
       def failure_stacktrace
         new_stacktrace = ""
         if self.document_location_in_creating_workspace
-          file_path = self.document_location_in_creating_workspace.url.gsub("file://", "")
-          new_stacktrace = "#{file_path}"
+          # eg. url property: file:///Users/rex/pn/PNMaintainer/PNMaintainerAppUITests/Helpers/LoginUITestHelper.swift#CharacterRangeLen=0&EndingLineNumber=17&StartingLineNumber=17
           uri = URI.parse(self.document_location_in_creating_workspace.url)
-          last_path = uri.path.split('/').last
           test_path = uri.path[/#{self.producing_target}.*/] # eg. AppUITest/Test.swift
-          puts "producingTarget: #{self.producing_target}"
-          puts "test_path: #{test_path}"
-          puts "path: #{uri.path}"
-          puts "last_path: #{last_path}"
-          puts "fragment: #{uri.fragment}"
-          puts "line num: #{uri.fragment[/StartingLineNumber=(.*)/, 1]}"
+          # extract line number from url fragment eg. "CharacterRangeLen=0&EndingLineNumber=17&StartingLineNumber=17"
           line_num = uri.fragment[/StartingLineNumber=(.*)/, 1]
 
           new_stacktrace = "#{test_path}:#{line_num}"

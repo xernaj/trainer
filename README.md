@@ -105,6 +105,27 @@ To make it easier for you and your contributors to see the test failures, you ca
 
 ![](assets/danger-output.png)
 
+### Azure DevOps pipelines
+
+`trainer` can be used to convert xcresult to a junit.xml that is compatible with `Azure DevOps Pipeline` mapping. This is particularly useful as out-of-the-box xcpretty junit.xml does not support parallel tests.
+
+Use options "failure_message_attribute_without_stacktrace" together with "stacktrace_in_failure_innertext" to produce a file that has a correctly mapped error message and stack trace.
+```
+trainer --failure_message_attribute_without_stacktrace true --stacktrace_in_failure_innertext true
+```
+Example xml fragment:
+```
+<testcase classname="UITests" name="testSample()" time="10.165534973144531">
+  <failure message="Failed to synthesize event: Failed to scroll to visible (by AX action) Button">MyAppUITests/UITests.swift:17</failure>
+</testcase>
+```
+Example xml fragment incompatible with Azure DevOps:
+```
+<testcase classname="UITests" name="testSample()" time="10.165534973144531">
+  <failure message="Failed to synthesize event: Failed to scroll to visible (by AX action) Button (/Users/me/MyApp/MyAppUITests/UITests.swift#CharacterRangeLen=0&amp;EndingLineNumber=17&amp;StartingLineNumber=17)"></failure>
+</testcase>
+```
+
 ### Thanks
 
 After the [lobbying of @steipete](https://twitter.com/steipete/status/753662170848690176) and the comment
