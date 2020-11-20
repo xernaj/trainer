@@ -111,7 +111,7 @@ To make it easier for you and your contributors to see the test failures, you ca
 
 Use options "failure_message_attribute_without_stacktrace" together with "stacktrace_in_failure_innertext" to produce a file that has a correctly mapped error message and stack trace.
 ```
-trainer --failure_message_attribute_without_stacktrace true --stacktrace_in_failure_innertext true
+trainer --failure_message_attribute_without_stacktrace --stacktrace_in_failure_innertext
 ```
 Example xml fragment:
 ```

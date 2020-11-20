@@ -54,6 +54,9 @@ module Trainer
 
         tp = Trainer::TestParser.new(path, config)
         File.write(to_path, tp.to_junit)
+        if config[:print_results]
+          tp.to_console
+        end
         puts "Successfully generated '#{to_path}'"
 
         return_hash[to_path] = tp.tests_successful?
@@ -77,6 +80,30 @@ module Trainer
         parse_content(config[:xcpretty_naming])
       end
     end
+
+    def seconds_to_hms(sec)
+      "%02dh %02dm %02ds" % [sec / 3600, sec / 60 % 60, sec % 60]
+    end  
+
+    def to_console
+      data.each do |file|
+        puts "Test name: #{file[:test_name]}"
+        file[:tests].each do |test|
+          output_line = ""
+          if test[:status] == "Success"
+            output_line += "✓"
+          else
+            output_line += "✗"
+          end
+          output_line += " #{test[:name]}"
+          puts output_line
+        end
+        puts "Executed #{file[:number_of_tests]} tests, with #{file[:number_of_failures]} failures in #{seconds_to_hms(file[:duration])}."
+        # Executed 212 tests, with 2 failures (0 unexpected) in 4171.600 (4171.717) seconds
+      end
+    end
+
+    #{:project_path=>"Themoji.xcodeproj", :target_name=>"Unit", :test_name=>"Unit", :duration=>nil, :tests=>[{:identifier=>"Unit/testExample()", :test_group=>"Unit", :name=>"testExample()", :object_class=>"IDESchemeActionTestSummary", :status=>"Success", :guid=>"307017AF-B8B5-4C61-9391-55C32AE57120", :duration=>nil}, {:identifier=>"Unit/testExample2()", :test_group=>"Unit", :name=>"testExample2()", :object_class=>"IDESchemeActionTestSummary", :status=>"Success", :guid=>"02BAA520-D026-4170-A266-37325E470369", :duration=>nil}, {:identifier=>"Unit/testPerformanceExample()", :test_group=>"Unit", :name=>"testPerformanceExample()", :object_class=>"IDESchemeActionTestSummary", :status=>"Success", :guid=>"DE485C5B-CFBF-4230-87E6-83B3194A4784", :duration=>nil}], :number_of_tests=>3, :number_of_failures=>0}
 
     # Returns the JUnit report as String
     def to_junit

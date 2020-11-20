@@ -49,6 +49,11 @@ module Trainer
                                      env_name: "TRAINER_STACKTRACE_IN_FAILURE_INNERTEXT",
                                      description: "Set to true to produce file and line number within failure message innertext like xcpretty junit.xml",
                                      is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :print_results,
+                                     env_name: "TRAINER_PRINT_RESULTS_TO_CONSOLE",
+                                     description: "Print results to console",
+                                     is_string: false,
                                      default_value: false)
       ]
     end
