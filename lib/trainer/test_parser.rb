@@ -83,23 +83,33 @@ module Trainer
 
     def seconds_to_hms(sec)
       "%02dh %02dm %02ds" % [sec / 3600, sec / 60 % 60, sec % 60]
+    end
+
+    def seconds_format(sec)
+      "%.3f seconds" % [sec]
     end  
 
     def to_console
       data.each do |file|
-        puts "Test name: #{file[:test_name]}"
+        puts "Test project name: #{file[:test_name]}"
+        test_output = Hash.new { |hash, key| hash[key] = Array.new }
         file[:tests].each do |test|
-          output_line = ""
+          output_line = "    "
           if test[:status] == "Success"
             output_line += "✓"
           else
             output_line += "✗"
           end
-          output_line += " #{test[:name]}"
-          puts output_line
+          test_name = test[:name].tr('()', '') # remove ( and ) characters from test name
+          output_line += " #{test_name} (#{seconds_format(test[:duration])})"
+          # add test_output with each line keyed by test_group name
+          test_output["#{test[:test_group]}"] << output_line
         end
-        puts "Executed #{file[:number_of_tests]} tests, with #{file[:number_of_failures]} failures in #{seconds_to_hms(file[:duration])}."
-        # Executed 212 tests, with 2 failures (0 unexpected) in 4171.600 (4171.717) seconds
+        # group test_output by key and sort alphabetically
+        grouped_test_output = test_output.group_by { |x| x }.sort_by { |y| y}
+        puts grouped_test_output
+        # when run as parallel tests, duration figure is cumulative so we won't print for now
+        puts "Executed #{file[:number_of_tests]} tests, with #{file[:number_of_failures]} failures."
       end
     end
 
