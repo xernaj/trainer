@@ -105,9 +105,9 @@ module Trainer
           # add test_output with each line keyed by test_group name
           test_output["#{test[:test_group]}"] << output_line
         end
-        # group test_output by key and sort alphabetically
-        grouped_test_output = test_output.group_by { |x| x }.sort_by { |y| y}
-        puts grouped_test_output
+        # sort test_output by key (already grouped above)
+        sorted_test_output = test_output.sort_by { |y| y}
+        puts sorted_test_output
         # when run as parallel tests, duration figure is cumulative so we won't print for now
         puts "Executed #{file[:number_of_tests]} tests, with #{file[:number_of_failures]} failures."
       end
