@@ -239,12 +239,16 @@ module Trainer
       attr_accessor :title
       attr_accessor :build_result
       attr_accessor :action_result
+      attr_accessor :started_time
+      attr_accessor :ended_time
       def initialize(data)
         self.scheme_command_name = fetch_value(data, "schemeCommandName")
         self.scheme_task_name = fetch_value(data, "schemeTaskName")
         self.title = fetch_value(data, "title")
         self.build_result = ActionResult.new(data["buildResult"])
         self.action_result = ActionResult.new(data["actionResult"])
+        self.started_time = fetch_value(data, "startedTime")
+        self.ended_time = fetch_value(data, "endedTime")
         super
       end
     end
