@@ -78,6 +78,42 @@ module Trainer
       end
     end
 
+    def seconds_to_hms(sec)
+      "%02dh %02dm %02ds" % [sec / 3600, sec / 60 % 60, sec % 60]
+    end
+
+    def seconds_format(sec)
+      "%.3f seconds" % [sec]
+    end  
+
+    def to_console
+      data.each do |file|
+        puts "Test project name: #{file[:test_name]}"
+        test_output = Hash.new { |hash, key| hash[key] = Array.new }
+        file[:tests].each do |test|
+          output_line = "    "
+          if test[:status] == "Success"
+            output_line += "✓"
+          elsif test[:status] == "Skipped"
+            output_line += "⤹"
+          else
+            output_line += "✗"
+          end
+          test_name = test[:name].tr('()', '') # remove ( and ) characters from test name
+          output_line += " #{test_name} (#{seconds_format(test[:duration])})"
+          # add test_output with each line keyed by test_group name
+          test_output["#{test[:test_group]}"] << output_line
+        end
+        # sort test_output by key (already grouped above)
+        sorted_test_output = test_output.sort_by { |y| y}
+        puts sorted_test_output
+        # when run as parallel tests, duration figure is cumulative so we won't print for now
+        puts "Executed #{file[:number_of_tests]} tests, with #{file[:number_of_failures]} failures."
+      end
+    end
+
+    #{:project_path=>"Themoji.xcodeproj", :target_name=>"Unit", :test_name=>"Unit", :duration=>nil, :tests=>[{:identifier=>"Unit/testExample()", :test_group=>"Unit", :name=>"testExample()", :object_class=>"IDESchemeActionTestSummary", :status=>"Success", :guid=>"307017AF-B8B5-4C61-9391-55C32AE57120", :duration=>nil}, {:identifier=>"Unit/testExample2()", :test_group=>"Unit", :name=>"testExample2()", :object_class=>"IDESchemeActionTestSummary", :status=>"Success", :guid=>"02BAA520-D026-4170-A266-37325E470369", :duration=>nil}, {:identifier=>"Unit/testPerformanceExample()", :test_group=>"Unit", :name=>"testPerformanceExample()", :object_class=>"IDESchemeActionTestSummary", :status=>"Success", :guid=>"DE485C5B-CFBF-4230-87E6-83B3194A4784", :duration=>nil}], :number_of_tests=>3, :number_of_failures=>0}
+
     # Returns the JUnit report as String
     def to_junit
       JunitGenerator.new(self.data).generate
