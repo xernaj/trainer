@@ -54,6 +54,9 @@ module Trainer
 
         tp = Trainer::TestParser.new(path, config)
         File.write(to_path, tp.to_junit)
+        if config[:print_results]
+          tp.to_console
+        end
         puts "Successfully generated '#{to_path}'"
 
         return_hash[to_path] = tp.tests_successful?
@@ -66,7 +69,7 @@ module Trainer
       UI.user_error!("File not found at path '#{path}'") unless File.exist?(path)
 
       if File.directory?(path) && path.end_with?(".xcresult")
-        parse_xcresult(path)
+        parse_xcresult(path, config[:stacktrace_in_failure_innertext], config[:failure_message_attribute_without_stacktrace])
       else
         self.file_content = File.read(path)
         self.raw_json = Plist.parse_xml(self.file_content)
@@ -182,7 +185,7 @@ module Trainer
       return output
     end
 
-    def parse_xcresult(path)
+    def parse_xcresult(path, stacktrace_in_failure_innertext, failure_message_attribute_without_stacktrace)
       require 'shellwords'
       path = Shellwords.escape(path)
 
@@ -207,10 +210,10 @@ module Trainer
 
       # Converts the ActionTestPlanRunSummaries to data for junit generator
       failures = actions_invocation_record.issues.test_failure_summaries || []
-      summaries_to_data(summaries, failures)
+      summaries_to_data(summaries, failures, stacktrace_in_failure_innertext, failure_message_attribute_without_stacktrace)
     end
 
-    def summaries_to_data(summaries, failures)
+    def summaries_to_data(summaries, failures, stacktrace_in_failure_innertext, failure_message_attribute_without_stacktrace)
       # Gets flat list of all ActionTestableSummary
       all_summaries = summaries.map(&:summaries).flatten
       testable_summaries = all_summaries.map(&:testable_summaries).flatten
@@ -239,7 +242,8 @@ module Trainer
               line_number: 0,
               message: "",
               performance_failure: {},
-              failure_message: failure.failure_message
+              failure_message: failure_message_attribute_without_stacktrace ? failure.message : failure.failure_message,
+              failure_stacktrace: stacktrace_in_failure_innertext ? failure.failure_stacktrace : ""
             }]
           end
 
@@ -289,7 +293,8 @@ module Trainer
                   line_number: current_failure['LineNumber'],
                   message: current_failure['Message'],
                   performance_failure: current_failure['PerformanceFailure'],
-                  failure_message: "#{current_failure['Message']} (#{current_failure['FileName']}:#{current_failure['LineNumber']})"
+                  failure_message: "#{current_failure['Message']} (#{current_failure['FileName']}:#{current_failure['LineNumber']})",
+                  failure_stacktrace: "#{current_failure['FileName']}:#{current_failure['LineNumber']}"
                 }
               end
             end

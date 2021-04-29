@@ -39,6 +39,21 @@ module Trainer
                                      env_name: "TRAINER_XCPRETTY_NAMING",
                                      description: "Produces class name and test name identical to xcpretty naming in junit file",
                                      is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :failure_message_attribute_without_stacktrace,
+                                     env_name: "TRAINER_FAILURE_MESSAGE_ATTRIBUTE_WITHOUT_STACKTRACE",
+                                     description: "Set to true to exclude file and line number within failure message attribute like xcpretty junit.xml",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :stacktrace_in_failure_innertext,
+                                     env_name: "TRAINER_STACKTRACE_IN_FAILURE_INNERTEXT",
+                                     description: "Set to true to produce file and line number within failure message innertext like xcpretty junit.xml",
+                                     is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :print_results,
+                                     env_name: "TRAINER_PRINT_RESULTS_TO_CONSOLE",
+                                     description: "Print results to console",
+                                     is_string: false,
                                      default_value: false)
       ]
     end

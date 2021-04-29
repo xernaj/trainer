@@ -239,12 +239,16 @@ module Trainer
       attr_accessor :title
       attr_accessor :build_result
       attr_accessor :action_result
+      attr_accessor :started_time
+      attr_accessor :ended_time
       def initialize(data)
         self.scheme_command_name = fetch_value(data, "schemeCommandName")
         self.scheme_task_name = fetch_value(data, "schemeTaskName")
         self.title = fetch_value(data, "title")
         self.build_result = ActionResult.new(data["buildResult"])
         self.action_result = ActionResult.new(data["actionResult"])
+        self.started_time = fetch_value(data, "startedTime")
+        self.ended_time = fetch_value(data, "endedTime")
         super
       end
     end
@@ -387,6 +391,20 @@ module Trainer
       def initialize(data)
         self.test_case_name = fetch_value(data, "testCaseName")
         super
+      end
+
+      def failure_stacktrace
+        new_stacktrace = ""
+        if self.document_location_in_creating_workspace
+          # eg. url property: file:///Users/rex/pn/PNMaintainer/PNMaintainerAppUITests/Helpers/LoginUITestHelper.swift#CharacterRangeLen=0&EndingLineNumber=17&StartingLineNumber=17
+          uri = URI.parse(self.document_location_in_creating_workspace.url)
+          test_path = uri.path[/#{self.producing_target}.*/] # eg. AppUITest/Test.swift
+          # extract line number from url fragment eg. "CharacterRangeLen=0&EndingLineNumber=17&StartingLineNumber=17"
+          line_num = uri.fragment[/StartingLineNumber=(.*)/, 1]
+
+          new_stacktrace = "#{test_path}:#{line_num}"
+        end
+        return new_stacktrace
       end
 
       def failure_message
