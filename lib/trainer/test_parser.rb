@@ -93,12 +93,14 @@ module Trainer
       data.each do |file|
         puts "Test project name: #{file[:test_name]}"
         test_output = Hash.new { |hash, key| hash[key] = Array.new }
+        skipped_tests = 0
         file[:tests].each do |test|
           output_line = "    "
           if test[:status] == "Success"
             output_line += "✓"
           elsif test[:status] == "Skipped"
             output_line += "⤹"
+            skipped_tests += 1
           else
             output_line += "✗"
           end
@@ -111,7 +113,7 @@ module Trainer
         sorted_test_output = test_output.sort_by { |y| y}
         puts sorted_test_output
         # when run as parallel tests, duration figure is cumulative so we won't print for now
-        puts "Executed #{file[:number_of_tests]} tests, with #{file[:number_of_failures]} failures."
+        puts "Executed #{file[:number_of_tests]} tests with #{skipped_tests} skipped and #{file[:number_of_failures]} failures."
       end
     end
 
