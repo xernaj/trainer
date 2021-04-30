@@ -12,6 +12,9 @@
           <% (test[:failures] || []).each do |failure| %>
             <failure message=<%= failure[:failure_message].encode(:xml => :attr) %>><%= failure[:failure_stacktrace].encode(:xml => :text) %></failure>
           <% end %>
+          <% if test[:status] == 'Skipped' %>
+          <skipped/>
+          <% end %>
         </testcase>
       <% end %>
     </testsuite>
